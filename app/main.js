@@ -16,7 +16,7 @@ async function getBookData(){
             const data = await response.json();
             console.log(data.data);
             //this is unique to THIS API
-            data.data.forEach((agent)=>console.log(agent.Title));
+            data.data.forEach((book)=>console.log(book.Title));
         }
     } catch (error) {
         alert("hey  I could not find that agent")
@@ -35,7 +35,7 @@ async function getShortsData(){
             const data = await response.json();
             console.log(data.data);
             //this is unique to THIS API
-            data.data.forEach((agent)=>console.log(agent.title));
+            data.data.forEach((short)=>console.log(short.title));
         }
     } catch (error) {
         alert("hey  I could not find that agent")
@@ -44,4 +44,8 @@ async function getShortsData(){
 
 getBookData();
 getShortsData();
+
+async function bkTitle(){
+    
+}
 
