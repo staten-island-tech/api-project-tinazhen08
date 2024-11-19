@@ -1,10 +1,11 @@
-import "./style.css";
+import "./css/style.css";
+import { DOMSelector } from "./dom";
 
 //get data
 //promise
 //show data
 
-async function getBookData(){
+/* async function getBookData(){
     try {
         //returns a promise 
         const response = await fetch ('https://stephen-king-api.onrender.com/api/books');
@@ -43,9 +44,19 @@ async function getShortsData(){
 }
 
 getBookData();
-getShortsData();
+getShortsData(); */
 
 async function bkTitle(){
-    
-}
+    try{
+        const response = await fetch ('https://stephen-king-api.onrender.com/api/books');
+        if (response.status != 200) {
+            throw new Error(response);
+        }else{
+            const data = await response.json();
+            
+        }
+    } catch (error){
+        alert("Couldn't find data")
+    }
+};
 
