@@ -53,7 +53,13 @@ async function bkTitle(){
             throw new Error(response);
         }else{
             const data = await response.json();
-            
+            DOMSelector.container.addEventListener(click, function(event){
+                event.preventDefault();
+                if (event.target.classList.contains(".submit")){
+                    let name = DOMSelector.bookT.value;
+                    const bookTitle = data.data.filter((book) => book.Title === `${name}`)
+                };
+            })
         }
     } catch (error){
         alert("Couldn't find data")
