@@ -1,4 +1,4 @@
-import "./css/style.css";
+import "../css/style.css";
 import { DOMSelector } from "./dom";
 
 //get data
@@ -46,6 +46,20 @@ async function getShortsData(){
 getBookData();
 getShortsData(); */
 
+function card(x) {
+    x.forEach((item) =>
+      DOMSelector.container.insertAdjacentHTML(
+        "beforeend",
+        `<div class="card">
+          <h2 class="card-header">${item.Title}</h2>
+          <p class="publisher">${item.Publisher}</p>
+          <p class="release">${item.Year}</p>
+          <h6 class="pages">$${item.Pages}</h6>
+        </div>`
+      )
+    );
+  }
+
 async function bkTitle(){
     try{
         const response = await fetch ('https://stephen-king-api.onrender.com/api/books');
@@ -58,6 +72,7 @@ async function bkTitle(){
                 if (event.target.classList.contains(".submit")){
                     let name = DOMSelector.bookT.value;
                     const bookTitle = data.data.filter((book) => book.Title === `${name}`)
+                    card(bookTitle);
                 };
             })
         }
