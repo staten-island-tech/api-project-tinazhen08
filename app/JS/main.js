@@ -47,37 +47,40 @@ getBookData();
 getShortsData(); */
 
 function card(x) {
-    x.forEach((item) =>
-      DOMSelector.container.insertAdjacentHTML(
-        "beforeend",
-        `<div class="card">
+  x.forEach((item) =>
+    DOMSelector.container.insertAdjacentHTML(
+      "beforeend",
+      `<div class="card">
           <h2 class="card-header">${item.Title}</h2>
           <p class="publisher">${item.Publisher}</p>
           <p class="release">${item.Year}</p>
           <h6 class="pages">$${item.Pages}</h6>
         </div>`
-      )
+    )
+  );
+}
+
+async function bkTitle() {
+  try {
+    const response = await fetch(
+      "https://stephen-king-api.onrender.com/api/books"
     );
-  }
-
-async function bkTitle(){
-    try{
-        const response = await fetch ('https://stephen-king-api.onrender.com/api/books');
-        if (response.status != 200) {
-            throw new Error(response);
-        }else{
-            const data = await response.json();
-            DOMSelector.container.addEventListener(click, function(event){
-                event.preventDefault();
-                if (event.target.classList.contains(".submit")){
-                    let name = DOMSelector.bookT.value;
-                    const bookTitle = data.data.filter((book) => book.Title === `${name}`)
-                    card(bookTitle);
-                };
-            })
-        }
-    } catch (error){
-        alert("Couldn't find data")
+    if (response.status != 200) {
+      throw new Error(response);
+    } else {
+      const data = await response.json();
+      DOMSelector.bookF.addEventListener("submit", function (event) {
+        event.preventDefault();
+        let name = DOMSelector.bookT.value;
+        const bookTitle = Array.from(
+          data.data.filter((book) => book.Title === `${name}`)
+        );
+        card(bookTitle);
+      });
     }
-};
+  } catch (error) {
+    alert("Couldn't find data");
+  }
+}
 
+bkTitle();
