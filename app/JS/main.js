@@ -43,8 +43,8 @@ async function getShortsData(){
     }
 }
 
-getBookData();
-getShortsData(); */
+const books = getBookData();
+const shorts = getShortsData(); */
 
 function card(x) {
   x.forEach((item) =>
@@ -83,4 +83,4 @@ async function bkTitle() {
   }
 }
 
-bkTitle();
+bkTitle(); 
