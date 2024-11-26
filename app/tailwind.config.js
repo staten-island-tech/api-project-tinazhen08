@@ -5,7 +5,6 @@ module.exports = {
     extend: {},
     container: {
       center: true,
-      flex: wrap,
     },
   },
   plugins: [require("daisyui")],
