@@ -5,7 +5,7 @@ import { DOMSelector } from "./dom";
 //promise
 //show data
 
-/* async function getBookData(){
+async function getBookData(){
     try {
         //returns a promise 
         const response = await fetch ('https://stephen-king-api.onrender.com/api/books');
@@ -16,8 +16,6 @@ import { DOMSelector } from "./dom";
             //convert promise to json
             const data = await response.json();
             console.log(data.data);
-            //this is unique to THIS API
-            data.data.forEach((book)=>console.log(book.Title));
         }
     } catch (error) {
         alert("hey  I could not find that agent")
@@ -35,16 +33,14 @@ async function getShortsData(){
             //convert promise to json
             const data = await response.json();
             console.log(data.data);
-            //this is unique to THIS API
-            data.data.forEach((short)=>console.log(short.title));
         }
     } catch (error) {
         alert("hey  I could not find that agent")
     }
 }
 
-const books = getBookData();
-const shorts = getShortsData(); */
+getBookData();
+getShortsData();
 
 function card(x) {
   x.forEach((item) =>
@@ -60,27 +56,19 @@ function card(x) {
   );
 }
 
-async function bkTitle() {
-  try {
-    const response = await fetch(
-      "https://stephen-king-api.onrender.com/api/books"
+async function btTitle() {
+  const response = await fetch("https://stephen-king-api.onrender.com/api/books")
+  const data = await response.json();
+  DOMSelector.bookF.addEventListener("submit", function (event) {
+    event.preventDefault();
+    let name = DOMSelector.bookT.value;
+    const bookTitle = Array.from(
+      data.data.filter((book) => book.Title === `${name}`)
     );
-    if (response.status != 200) {
-      throw new Error(response);
-    } else {
-      const data = await response.json();
-      DOMSelector.bookF.addEventListener("submit", function (event) {
-        event.preventDefault();
-        let name = DOMSelector.bookT.value;
-        const bookTitle = Array.from(
-          data.data.filter((book) => book.Title === `${name}`)
-        );
-        card(bookTitle);
-      });
-    }
-  } catch (error) {
-    alert("Couldn't find data");
-  }
-}
+    card(bookTitle); 
+    DOMSelector.bookT.value = "";
+  });
+};
 
-bkTitle(); 
+btTitle();
+
