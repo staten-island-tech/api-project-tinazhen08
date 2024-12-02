@@ -14,6 +14,7 @@ function card(x) {
           <p class="publisher">${item.Publisher}</p>
           <p class="release">${item.Year}</p>
           <h6 class="pages">$${item.Pages}</h6>
+          <button class="text-lg" id="choose">Choose Book</button>
         </div>`
     )
   );
@@ -74,3 +75,9 @@ async function btTitle() {
 
 btTitle();
 
+function chooseBk(){
+  DOMSelector.card.addEventListener('clikc', function(event){
+    event.preventDefault();
+    DOMSelector.container.innerHTML = ""
+  })
+}
