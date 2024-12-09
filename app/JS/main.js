@@ -5,22 +5,8 @@ import { DOMSelector } from "./dom";
 //promise
 //show data
 
-function card(x) {
-  x.forEach((item) =>
-    DOMSelector.container.insertAdjacentHTML(
-      "beforeend",
-      `<div class="card">
-          <h2 class="card-header">${item.Title}</h2>
-          <p class="publisher">${item.Publisher}</p>
-          <p class="release">${item.Year}</p>
-          <h6 class="pages">$${item.Pages}</h6>
-          <button class="text-lg" id="choose">Choose Book</button>
-        </div>`
-    )
-  );
-}
 
-async function getBookData(){
+async function getData(){
     try {
         //returns a promise 
         const response = await fetch ('https://stephen-king-api.onrender.com/api/books');
@@ -30,54 +16,66 @@ async function getBookData(){
         }else{
             //convert promise to json
             const data = await response.json();
-            console.log(data.data);
-            card(data.data);
+            return data.data
         }
     } catch (error) {
         alert("hey  I could not find that agent")
     }
 };
 
-async function getShortsData(){
-    try {
-        //returns a promise 
-        const response = await fetch ('https://stephen-king-api.onrender.com/api/shorts');
-        //guard clause 
-        if (response.status != 200) {
-            throw new Error(response);
-        }else{
-            //convert promise to json
-            const data = await response.json();
-            console.log(data.data);
-        }
-    } catch (error) {
-        alert("hey  I could not find that agent")
-    }
+let score = 0;
+
+// Shuffle function to randomize the answer choices
+function shuffle(array) {
+  for (let i = array.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [array[i], array[j]] = [array[j], array[i]]; 
+  }
+  return array;
 }
 
-getBookData();
-getShortsData();
+function checkAnswer(selectedAnswer, correctAsnwer){
+  if (selectedAnswer === correctAsnwer){
+    score++
+    DOMSelector.message.innerText = 'Correct Answer Selected!'
+  }else{
+    score === 0
+    DOMSelector.message.innerText = `Incorrect Answer Selected! The correct answer was ${correctAsnwer}. Score has been reset.`
+  }
 
-async function btTitle() {
-  const response = await fetch("https://stephen-king-api.onrender.com/api/books")
-  const data = await response.json();
-  DOMSelector.bookF.addEventListener("submit", function (event) {
+  DOMSelector.score.innerText = `Score: ${score}`
+  yearQuestion();
+}
+
+async function yearQuestion(){ //Random Question about book release year
+  const data = await getData(); 
+  const book = data[Math.floor(Math.random() * data.length)];
+  const question = `What year was ${book.Title} published?`;
+
+  const correctAnswer = book.Year;
+  const wrongAnswers = [
+    correctAnswer - 1,
+    correctAnswer + 1,
+    correctAnswer + 2
+  ];
+
+  const choices = shuffle([correctAnswer, ...wrongAnswers]);
+
+  //Display question
+  DOMSelector.question.innerText = question;
+  DOMSelector.choices.innerHTML = '';
+
+  choices.forEach((answer) => {
+    DOMSelector.choices.insertAdjacentHTML(
+      "beforeend",
+      `<button type="click">${answer}</button>`
+    )
+  })
+
+  DOMSelector.choices.addEventListener("click", function(event){
     event.preventDefault();
-    DOMSelector.container.innerHTML = ""
-    let name = DOMSelector.bookT.value;
-    const bookTitle = Array.from(
-      data.data.filter((book) => book.Title === `${name}`)
-    );
-    card(bookTitle); 
-    DOMSelector.bookT.value = "";
-  });
-};
-
-btTitle();
-
-function chooseBk(){
-  DOMSelector.card.addEventListener('clikc', function(event){
-    event.preventDefault();
-    DOMSelector.container.innerHTML = ""
+    checkAnswer(event.target.innerText, correctAnswer);
   })
 }
+
+yearQuestion();
