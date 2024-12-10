@@ -5,7 +5,6 @@ import { DOMSelector } from "./dom";
 //promise
 //show data
 
-
 async function getData(){
     try {
         //returns a promise 
@@ -47,7 +46,7 @@ function checkAnswer(selectedAnswer, correctAnswer) {
   genRandomQuestion();
 }
 
-function genRandomQuestion() {
+async function genRandomQuestion() {
   const randomQuestion = Math.floor(Math.random() * 3);
 
   if (randomQuestion === 0) {
@@ -190,7 +189,7 @@ function start() {
       "beforeend",
       `<div class="grid justify-items-center" id="card">
         <h2 class="text-4xl text-center my-10" id="question"></h2>
-        <div class="flex flex-row space-x-4 justify-center" id="choices"></div>
+        <div class="flex space-x-4 justify-center" id="choices"></div>
         <h3 class="text-2xl" id="score">Score: 0</h3>
         <p class="text-2xl my-10" id="message"></p>
       </div>`
