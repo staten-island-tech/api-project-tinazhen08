@@ -16,7 +16,6 @@ async function getData(){
         }else{
             //convert promise to json
             const data = await response.json();
-            console.log(data.data)
             return data.data
         }
     } catch (error) {
@@ -26,7 +25,7 @@ async function getData(){
 
 let score = 0;
 
-// Shuffle function to randomize the answer choices
+//Shuffle function to randomize the answer choices
 function shuffle(array) {
   for (let i = array.length - 1; i > 0; i--) {
     const j = Math.floor(Math.random() * (i + 1));
@@ -45,6 +44,9 @@ function checkAnswer(selectedAnswer, correctAsnwer){
   }
 
   DOMSelector.score.innerText = `Score: ${score}`
+  DOMSelector.question.innerText = "";
+  DOMSelector.choices.innerHTML = "";
+
   genRandomQuestion(); 
 }
 
@@ -78,12 +80,11 @@ async function year(){ //Random question about book release year
 
   //Display question
   DOMSelector.question.innerText = question;
-  DOMSelector.choices.innerHTML = '';
 
   choices.forEach((answer) => {
     DOMSelector.choices.insertAdjacentHTML(
       "beforeend",
-      `<button type="click">${answer}</button>`
+      `<button class="btn btn-primary h-20 px-6 m-2 text-3xl" type="click">${answer}</button>`
     )
   })
 
@@ -96,7 +97,7 @@ async function year(){ //Random question about book release year
 async function publisher(){ //Random question about book publisher 
   const data = await getData();
   const book = data[Math.floor(Math.random() * data.length)];
-  const question = `What was the publisher of ${book.Title}?`;
+  const question = `What was the publisher of the book "${book.Title}"?`;
   console.log("Question:", question);  //Log the question for verification
 
   const correctAnswer = book.Publisher
@@ -113,12 +114,11 @@ async function publisher(){ //Random question about book publisher
 
   //Display question
   DOMSelector.question.innerText = question;
-  DOMSelector.choices.innerHTML = '';
 
   choices.forEach((answer) => {
     DOMSelector.choices.insertAdjacentHTML(
       "beforeend",
-      `<button type="click">${answer}</button>`
+      `<button class="btn btn-accent h-20 px-6 m-2 text-3xl" type="click">${answer}</button>`
     )
   })
 
@@ -150,9 +150,9 @@ async function villain() {
   const wrongAnswers = [];
   while (wrongAnswers.length < 3) {
     const randomBook = data[Math.floor(Math.random() * data.length)];
-    if (randomBook.Title !== book.Title && randomBook.villains) {
+    if (randomBook.Title !== book.Title && randomBook.villains && randomBook.villains.length > 0) {
       const randomVillain = randomBook.villains[Math.floor(Math.random() * randomBook.villains.length)];
-      if (!wrongAnswers.includes(randomVillain)) {
+      if (randomVillain && !wrongAnswers.includes(randomVillain.name)) {
         wrongAnswers.push(randomVillain.name);
       }
     }
@@ -163,12 +163,11 @@ async function villain() {
 
   //Display question
   DOMSelector.question.innerText = question;
-  DOMSelector.choices.innerHTML = ''; 
 
   choices.forEach((answer) => {
     DOMSelector.choices.insertAdjacentHTML(
       "beforeend",
-      `<button type="button">${answer}</button>`
+      `<button class="btn btn-secondary h-20 px-6 m-2 text-3xl" type="click">${answer}</button>`
     );
   });
 
@@ -178,4 +177,33 @@ async function villain() {
   })
 }
 
-genRandomQuestion();
+function start(){
+  DOMSelector.startBtn.addEventListener("click", function(event){
+    event.preventDefault();
+    console.log("Start Button Clicked!")
+
+    DOMSelector.container.innerHTML = "";
+    
+    DOMSelector.container.insertAdjacentHTML(
+      "beforeend",
+      `<div class="grid justify-items-center" id="card">
+        <h2 class="text-6xl text-center my-10" id="question"></h2>
+        <div class="flex flex-row space-x-4 justify-center" id="choices" ></div>
+        <h3 class="text-4xl" id="score">Score: 0</h3>
+        <p class="text-4xl my-10" id="message"></p>
+      </div>`
+    );
+
+    // After the HTML is inserted, update the DOMSelector references
+    DOMSelector.question = document.getElementById('question');
+    DOMSelector.choices = document.getElementById('choices');
+    DOMSelector.score = document.getElementById('score');
+    DOMSelector.message = document.getElementById('message');
+
+    // Remove the start button and generate the first random question
+    DOMSelector.startBtn.remove();
+    genRandomQuestion();
+  })
+};
+
+start();
