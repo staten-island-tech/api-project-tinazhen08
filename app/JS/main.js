@@ -46,7 +46,7 @@ function checkAnswer(selectedAnswer, correctAnswer) {
   genRandomQuestion();
 }
 
-async function genRandomQuestion() {
+function genRandomQuestion() {
   const randomQuestion = Math.floor(Math.random() * 3);
 
   if (randomQuestion === 0) {
