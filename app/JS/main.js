@@ -24,8 +24,9 @@ async function getData(){
 };
 
 let score = 0;
+let quizFinished = false; // Variable to track whether the quiz is finished
 
-//Shuffle function to randomize the answer choices
+// Shuffle function to randomize the answer choices
 function shuffle(array) {
   for (let i = array.length - 1; i > 0; i--) {
     const j = Math.floor(Math.random() * (i + 1));
@@ -34,39 +35,48 @@ function shuffle(array) {
   return array;
 }
 
-function checkAnswer(selectedAnswer, correctAsnwer){
-  if (selectedAnswer === correctAsnwer){
-    score++
-    DOMSelector.message.innerText = 'Correct Answer Selected!'
-  }else{
-    score = 0
-    DOMSelector.message.innerText = `Incorrect Answer Selected! The correct answer was ${correctAsnwer}. Score has been reset.`
+function checkAnswer(selectedAnswer, correctAnswer) {
+  if (quizFinished) return; // Prevent answering if the quiz is finished
+
+  if (selectedAnswer === correctAnswer) {
+    score++;
+    DOMSelector.message.innerText = 'Correct Answer Selected!';
+  } else {
+    score = 0;
+    DOMSelector.message.innerText = `Incorrect Answer Selected! The correct answer was ${correctAnswer}. Score has been reset.`;
   }
 
-  DOMSelector.score.innerText = `Score: ${score}`
-  DOMSelector.question.innerText = "";
-  DOMSelector.choices.innerHTML = "";
+  DOMSelector.score.innerText = `Score: ${score}`;
 
-  genRandomQuestion(); 
+  // Check if you want to stop the quiz after a certain score or number of questions
+  if (score >= 5) { // For example, stop after 5 correct answers
+    DOMSelector.message.innerText += " Quiz Finished!";
+    quizFinished = true; // End the quiz
+    return;
+  }
+
+  // Generate the next random question
+  genRandomQuestion();
 }
 
-function genRandomQuestion(){
-  const randomQuestion = Math.floor(Math.random() * 3)
+function genRandomQuestion() {
+  if (quizFinished) return; // Prevent generating new questions if quiz is finished
 
-  if (randomQuestion === 0){
+  const randomQuestion = Math.floor(Math.random() * 3);
+
+  if (randomQuestion === 0) {
     year();
-  }else if (randomQuestion === 1){
+  } else if (randomQuestion === 1) {
     publisher();
-  }else{
+  } else {
     villain();
   }
 }
 
-async function year(){ //Random question about book release year
+async function year() {
   const data = await getData(); 
   const book = data[Math.floor(Math.random() * data.length)];
   const question = `What year was ${book.Title} published?`;
-  console.log("Question:", question);  //Log the question for verification
 
   const correctAnswer = book.Year;
   const wrongAnswers = [
@@ -76,31 +86,38 @@ async function year(){ //Random question about book release year
   ];
 
   const choices = shuffle([correctAnswer, ...wrongAnswers]);
-  console.log("Choices:", choices);  //Log the choices for verification
 
-  //Display question
+  // Display question
   DOMSelector.question.innerText = question;
+  DOMSelector.choices.innerHTML = '';
 
   choices.forEach((answer) => {
     DOMSelector.choices.insertAdjacentHTML(
       "beforeend",
-      `<button class="btn btn-primary h-20 px-6 m-2 text-3xl" type="click">${answer}</button>`
-    )
-  })
+      `<button class="btn btn-primary h-20 px-6 m-2 text-3xl" type="button">${answer}</button>`
+    );
+  });
 
-  DOMSelector.choices.addEventListener("click", function(event){
-    event.preventDefault();
-    checkAnswer(event.target.innerText, correctAnswer);
-  })
+  // Remove the previous event listener to prevent duplicates
+  DOMSelector.choices.removeEventListener("click", handleChoiceClick);
+  
+  // Add a new event listener
+  DOMSelector.choices.addEventListener("click", handleChoiceClick);
+
+  function handleChoiceClick(event) {
+    if (event.target.tagName === "BUTTON") {
+      event.preventDefault();
+      checkAnswer(event.target.innerText, correctAnswer);
+    }
+  }
 }
 
-async function publisher(){ //Random question about book publisher 
+async function publisher() {
   const data = await getData();
   const book = data[Math.floor(Math.random() * data.length)];
   const question = `What was the publisher of the book "${book.Title}"?`;
-  console.log("Question:", question);  //Log the question for verification
 
-  const correctAnswer = book.Publisher
+  const correctAnswer = book.Publisher;
   const wrongAnswers = [];
   while (wrongAnswers.length < 3) {
     const randomBook = data[Math.floor(Math.random() * data.length)];
@@ -110,43 +127,48 @@ async function publisher(){ //Random question about book publisher
   }
 
   const choices = shuffle([correctAnswer, ...wrongAnswers]);
-  console.log("Choices:", choices);  //Log the choices for verification
 
-  //Display question
+  // Display question
   DOMSelector.question.innerText = question;
+  DOMSelector.choices.innerHTML = '';
 
   choices.forEach((answer) => {
     DOMSelector.choices.insertAdjacentHTML(
       "beforeend",
-      `<button class="btn btn-accent h-20 px-6 m-2 text-3xl" type="click">${answer}</button>`
-    )
-  })
+      `<button class="btn btn-accent h-20 px-6 m-2 text-3xl" type="button">${answer}</button>`
+    );
+  });
 
-  DOMSelector.choices.addEventListener("click", function(event){
-    event.preventDefault();
-    checkAnswer(event.target.innerText, correctAnswer);
-  })
+  // Remove the previous event listener to prevent duplicates
+  DOMSelector.choices.removeEventListener("click", handleChoiceClick);
+
+  // Add a new event listener
+  DOMSelector.choices.addEventListener("click", handleChoiceClick);
+
+  function handleChoiceClick(event) {
+    if (event.target.tagName === "BUTTON") {
+      event.preventDefault();
+      checkAnswer(event.target.innerText, correctAnswer);
+    }
+  }
 }
 
 async function villain() {
   const data = await getData();
-  
   let book = data[Math.floor(Math.random() * data.length)];
 
-  //Check if the selected book has villains
+  // Check if the selected book has villains
   if (!book.villains || book.villains.length === 0) {
-    console.log(`No villains found in ${book.Title}, selecting another book.`);
     return villain();  
   }
   
   const selectedVillain = book.villains.length === 1
     ? book.villains[0]   // If only one villain, select it
-    : book.villains[Math.floor(Math.random() * book.villains.length)]; //If more than 1, select randomly
+    : book.villains[Math.floor(Math.random() * book.villains.length)]; // If more than 1, select randomly
 
   const question = `Which villain was in the book "${book.Title}"?`;
-  console.log("Question:", question);  //Log the question for verification
 
-  const correctAnswer = selectedVillain.name
+  const correctAnswer = selectedVillain.name;
   const wrongAnswers = [];
   while (wrongAnswers.length < 3) {
     const randomBook = data[Math.floor(Math.random() * data.length)];
@@ -159,36 +181,43 @@ async function villain() {
   }
 
   const choices = shuffle([correctAnswer, ...wrongAnswers]);
-  console.log("Choices:", choices);  //Log the choices for verification
 
-  //Display question
+  // Display question
   DOMSelector.question.innerText = question;
+  DOMSelector.choices.innerHTML = '';
 
   choices.forEach((answer) => {
     DOMSelector.choices.insertAdjacentHTML(
       "beforeend",
-      `<button class="btn btn-secondary h-20 px-6 m-2 text-3xl" type="click">${answer}</button>`
+      `<button class="btn btn-secondary h-20 px-6 m-2 text-3xl" type="button">${answer}</button>`
     );
   });
 
-  DOMSelector.choices.addEventListener("click", function(event){
-    event.preventDefault();
-    checkAnswer(event.target.innerText, correctAnswer);
-  })
+  // Remove the previous event listener to prevent duplicates
+  DOMSelector.choices.removeEventListener("click", handleChoiceClick);
+
+  // Add a new event listener
+  DOMSelector.choices.addEventListener("click", handleChoiceClick);
+
+  function handleChoiceClick(event) {
+    if (event.target.tagName === "BUTTON") {
+      event.preventDefault();
+      checkAnswer(event.target.innerText, correctAnswer);
+    }
+  }
 }
 
-function start(){
-  DOMSelector.startBtn.addEventListener("click", function(event){
+function start() {
+  DOMSelector.startBtn.addEventListener("click", function(event) {
     event.preventDefault();
-    console.log("Start Button Clicked!")
 
     DOMSelector.container.innerHTML = "";
-    
+
     DOMSelector.container.insertAdjacentHTML(
       "beforeend",
       `<div class="grid justify-items-center" id="card">
         <h2 class="text-6xl text-center my-10" id="question"></h2>
-        <div class="flex flex-row space-x-4 justify-center" id="choices" ></div>
+        <div class="flex flex-row space-x-4 justify-center" id="choices"></div>
         <h3 class="text-4xl" id="score">Score: 0</h3>
         <p class="text-4xl my-10" id="message"></p>
       </div>`
@@ -203,7 +232,7 @@ function start(){
     // Remove the start button and generate the first random question
     DOMSelector.startBtn.remove();
     genRandomQuestion();
-  })
-};
+  });
+}
 
 start();
