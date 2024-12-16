@@ -105,7 +105,7 @@ async function year(){
      return null; 
     }else{
       const book = data[Math.floor(Math.random() * data.length)];
-      const question = `What year was ${book.Title} published?`;
+      const question = `What year was "${book.Title}" published?`;
       console.log("Question:", question); 
     
       const correctAnswer = book.Year;
